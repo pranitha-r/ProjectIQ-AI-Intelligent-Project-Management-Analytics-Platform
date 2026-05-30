@@ -151,13 +151,6 @@ http://localhost:3000
 * Resource utilization tracking
 * Sprint performance measurement
 
----
-
-## ⚠️ Important Note
-
-This platform is intended for educational, project management, and analytics purposes.
-
-Forecasts and risk assessments are generated using analytical models and should be used as decision-support tools rather than guarantees of project outcomes.
 
 ---
 
@@ -177,14 +170,6 @@ The application uses the following technologies:
 * CSS3
 * JavaScript
 
-### Analytics
-
-* Monte Carlo Simulation
-* Custom Risk Analysis Engine
-
-External libraries are governed by their respective licenses. This repository is licensed under the MIT License.
-
----
 
 ## 📁 Project Files
 
