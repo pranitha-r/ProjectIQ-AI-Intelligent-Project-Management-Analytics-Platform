@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ProjectIQ – AI-Powered Project Intelligence Platform</title>
+  <meta name="description" content="AI-powered project intelligence with completion prediction, delay forecasting, team overload detection, productivity analytics, risk scoring, and AI health reports." />
+  <link rel="stylesheet" href="css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════
+     SIDEBAR
+═══════════════════════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🧠</div>
+    <div>
+      <div class="logo-text">ProjectIQ</div>
+      <div class="logo-sub">AI Intelligence Platform</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Overview</div>
+    <a class="nav-item active" data-page="dashboard" id="nav-dashboard" onclick="navigate('dashboard')">
+      <span class="nav-icon">🏠</span> Dashboard
+    </a>
+
+    <div class="nav-section-label">AI Features</div>
+    <a class="nav-item" data-page="completion" id="nav-completion" onclick="navigate('completion')">
+      <span class="nav-icon">📅</span> Completion Dates
+    </a>
+    <a class="nav-item" data-page="delay" id="nav-delay" onclick="navigate('delay')">
+      <span class="nav-icon">⚠️</span> Delay Prediction
+      <span class="nav-badge" id="badge-delay">3</span>
+    </a>
+    <a class="nav-item" data-page="overload" id="nav-overload" onclick="navigate('overload')">
+      <span class="nav-icon">🔥</span> Team Overload
+      <span class="nav-badge" id="badge-overload">4</span>
+    </a>
+    <a class="nav-item" data-page="productivity" id="nav-productivity" onclick="navigate('productivity')">
+      <span class="nav-icon">📈</span> Productivity
+    </a>
+    <a class="nav-item" data-page="risk" id="nav-risk" onclick="navigate('risk')">
+      <span class="nav-icon">🛡️</span> Risk Scoring
+    </a>
+    <a class="nav-item" data-page="reports" id="nav-reports" onclick="navigate('reports')">
+      <span class="nav-icon">🤖</span> AI Reports
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="user-avatar">PM</div>
+      <div>
+        <div class="user-name">Project Manager</div>
+        <div class="user-role">Admin · Apollo Corp</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ══════════════════════════════════════════════════════════
+     MAIN CONTENT
+═══════════════════════════════════════════════════════════ -->
+<main class="main-content">
+
+  <!-- ── TOPBAR ─────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-title" id="topbar-title">Dashboard Overview</div>
+      <div class="topbar-subtitle" id="topbar-subtitle">Real-time project intelligence · Updated just now</div>
+    </div>
+    <div class="topbar-right">
+      <select id="theme-selector" onchange="setTheme(this.value)" style="margin-right: 8px; font-weight: 600;">
+        <option value="default">🌌 Dark Glass</option>
+        <option value="frost">❄️ Nordic Frost</option>
+        <option value="slate">🪙 Monochrome Slate</option>
+        <option value="cyberpunk">👾 Cyberpunk Oasis</option>
+      </select>
+      <button class="topbar-btn" onclick="openTaskModal()">➕ New Task</button>
+      <button class="topbar-btn" onclick="refreshAll()">🔄 Refresh</button>
+      <button class="topbar-btn primary" onclick="navigate('reports')">🤖 Generate Report</button>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════
+       PAGE: DASHBOARD
+  ═══════════════════════════════════════════════════════ -->
+  <section class="page active" id="page-dashboard">
+    <div class="section-header">
+      <div>
+        <div class="section-title">🏠 Portfolio Overview</div>
+        <div class="section-subtitle">All active projects · AI-monitored in real-time</div>
+      </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="stat-grid">
+      <div class="stat-card success">
+        <div class="stat-label">Active Projects</div>
+        <div class="stat-value gradient" id="dash-stat-projects">–</div>
+        <div class="stat-delta up">▲ All on monitor</div>
+        <div class="stat-icon">📁</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Open Tasks</div>
+        <div class="stat-value gradient" id="dash-stat-tasks">–</div>
+        <div class="stat-delta">Across all projects</div>
+        <div class="stat-icon">✅</div>
+      </div>
+      <div class="stat-card danger">
+        <div class="stat-label">Blocked Tasks</div>
+        <div class="stat-value" style="color:var(--accent-red)" id="dash-stat-blocked">–</div>
+        <div class="stat-delta down">Needs attention</div>
+        <div class="stat-icon">🚫</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Team Members</div>
+        <div class="stat-value gradient" id="dash-stat-members">–</div>
+        <div class="stat-delta">Engineers &amp; designers</div>
+        <div class="stat-icon">👥</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="gap:20px;margin-bottom:20px;">
+      <!-- Project health -->
+      <div class="card">
+        <div class="card-title">📁 Project Health</div>
+        <div class="card-subtitle">AI risk assessment per project</div>
+        <div id="dash-project-list"></div>
+      </div>
+
+      <!-- Sprint Velocity -->
+      <div class="card">
+        <div class="card-title">🚀 Sprint Velocity Trend</div>
+        <div class="card-subtitle">Planned vs completed story points</div>
+        <div class="chart-wrap" style="height:220px;">
+          <canvas id="dash-velocity-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Risk Events -->
+    <div class="card">
+      <div class="card-title">⚠️ Recent Risk Events</div>
+      <div class="card-subtitle">Logged across all projects · Latest first</div>
+      <div id="dash-risk-events"></div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════
+       PAGE: COMPLETION DATE PREDICTION
+  ═══════════════════════════════════════════════════════ -->
+  <section class="page" id="page-completion">
+    <div class="section-header">
+      <div>
+        <div class="section-title">📅 Completion Date Prediction</div>
+        <div class="section-subtitle">Monte Carlo simulation · PERT estimation · 1 000 scenario runs</div>
+      </div>
+    </div>
+
+    <div class="project-selector" id="completion-proj-selector"></div>
+
+    <div id="comp-status-alert" class="alert alert-amber" style="margin-bottom:20px;">
+      <span class="alert-icon">⏳</span><span>Loading prediction…</span>
+    </div>
+
+    <!-- Stats -->
+    <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);">
+      <div class="stat-card">
+        <div class="stat-label">Total Story Points</div>
+        <div class="stat-value gradient" id="comp-total-sp">–</div>
+        <div class="stat-icon">📊</div>
+      </div>
+      <div class="stat-card success">
+        <div class="stat-label">Completed SP</div>
+        <div class="stat-value" style="color:var(--accent-green)" id="comp-completed-sp">–</div>
+        <div class="stat-icon">✅</div>
+      </div>
+      <div class="stat-card warning">
+        <div class="stat-label">Remaining SP</div>
+        <div class="stat-value" style="color:var(--accent-amber)" id="comp-remaining-sp">–</div>
+        <div class="stat-icon">⏳</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg Velocity</div>
+        <div class="stat-value gradient" id="comp-velocity">–</div>
+        <div class="stat-delta">SP/sprint</div>
+        <div class="stat-icon">⚡</div>
+      </div>
+    </div>
+
+    <!-- Confidence Bands -->
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-title">🎯 Completion Confidence Intervals</div>
+      <div class="card-subtitle">Based on 1 000 Monte Carlo simulations using historical velocity</div>
+      <div class="confidence-band">
+        <div class="conf-item">
+          <div class="conf-pct">50% Confidence</div>
+          <div class="conf-date p50" id="comp-p50-date">–</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Best case</div>
+        </div>
+        <div class="conf-item">
+          <div class="conf-pct">75% Confidence</div>
+          <div class="conf-date p75" id="comp-p75-date">–</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Recommended target</div>
+        </div>
+        <div class="conf-item">
+          <div class="conf-pct">90% Confidence</div>
+          <div class="conf-date p90" id="comp-p90-date">–</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Worst case</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:20px;">
+      <!-- Burndown Chart -->
+      <div class="card">
+        <div class="card-title">📉 Burndown Chart + Projection</div>
+        <div class="card-subtitle">Actual remaining SP with P75 forecast line</div>
+        <div class="chart-wrap" style="height:260px;">
+          <canvas id="comp-burndown-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- Monte Carlo distribution -->
+      <div class="card">
+        <div class="card-title">🎲 Monte Carlo Distribution</div>
+        <div class="card-subtitle">Sprint count distribution across 1 000 simulations</div>
+        <div class="chart-wrap" style="height:260px;">
+          <canvas id="comp-monte-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- PERT Card -->
+    <div class="card">
+      <div class="card-title">📐 PERT Analysis</div>
+      <div class="card-subtitle">Program Evaluation and Review Technique estimation</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:8px;">
+        <div style="text-align:center;padding:16px;background:rgba(255,255,255,0.04);border-radius:12px;">
+          <div style="font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;margin-bottom:6px;">Expected</div>
+          <div style="font-size:22px;font-weight:800;color:var(--accent-violet);" id="comp-pert-expected">–</div>
+        </div>
+        <div style="text-align:center;padding:16px;background:rgba(255,255,255,0.04);border-radius:12px;">
+          <div style="font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;margin-bottom:6px;">Optimistic</div>
+          <div style="font-size:22px;font-weight:800;color:var(--accent-green);" id="comp-pert-optimistic">–</div>
+        </div>
+        <div style="text-align:center;padding:16px;background:rgba(255,255,255,0.04);border-radius:12px;">
+          <div style="font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;margin-bottom:6px;">Pessimistic</div>
+          <div style="font-size:22px;font-weight:800;color:var(--accent-red);" id="comp-pert-pessimistic">–</div>
+        </div>
+        <div style="text-align:center;padding:16px;background:rgba(255,255,255,0.04);border-radius:12px;">
+          <div style="font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;margin-bottom:6px;">Std Dev</div>
+          <div style="font-size:22px;font-weight:800;color:var(--accent-cyan);" id="comp-pert-stddev">–</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════
+       PAGE: DELAY PREDICTION
+  ═══════════════════════════════════════════════════════ -->
+  <section class="page" id="page-delay">
+    <div class="section-header">
+      <div>
+        <div class="section-title">⚠️ Delay Prediction</div>
+        <div class="section-subtitle">ML-scored tasks · Gradient-boosted delay probability per task</div>
+      </div>
+      <div class="section-actions">
+        <select id="delay-proj-filter"></select>
+      </div>
+    </div>
+
+    <div id="delay-summary" class="alert alert-amber" style="margin-bottom:20px;">
+      <span class="alert-icon">⏳</span><span>Analyzing tasks…</span>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:20px;">
+      <div class="card" style="grid-column:1/-1;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div class="card-title">🔍 Task Delay Risk Scores</div>
+            <div class="card-subtitle">Ranked by delay probability · All open tasks</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Task</th>
+                <th>Assignee</th>
+                <th>Status</th>
+                <th style="min-width:160px;">Delay Probability</th>
+                <th>Risk Level</th>
+                <th>Due Date</th>
+                <th>Time Slip</th>
+                <th>Size</th>
+                <th>Dependencies</th>
+              </tr>
+            </thead>
+            <tbody id="delay-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">📊 Risk Distribution</div>
+        <div class="card-subtitle">Tasks by delay risk category</div>
+        <div class="chart-wrap" style="height:260px;">
+          <canvas id="delay-dist-chart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🧮 Delay Factor Weights</div>
+        <div class="card-subtitle">How the ML model scores each factor</div>
+        <div style="margin-top:8px;" id="delay-factor-weights">
+          <div style="margin-bottom:12px;">
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+              <span style="color:var(--text-secondary);">Task Complexity</span>
+              <span style="font-weight:700;color:#8b5cf6;">25%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:100%;background:#8b5cf6;"></div></div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+              <span style="color:var(--text-secondary);">Assignee Workload</span>
+              <span style="font-weight:700;color:#ef4444;">20%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:80%;background:#ef4444;"></div></div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+              <span style="color:var(--text-secondary);">Historical Slip</span>
+              <span style="font-weight:700;color:#f59e0b;">15%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:60%;background:#f59e0b;"></div></div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+              <span style="color:var(--text-secondary);">On-time Rate</span>
+              <span style="font-weight:700;color:#ec4899;">15%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:60%;background:#ec4899;"></div></div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+              <span style="color:var(--text-secondary);">Days Over Estimate</span>
+              <span style="font-weight:700;color:#06b6d4;">15%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:60%;background:#06b6d4;"></div></div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+              <span style="color:var(--text-secondary);">Dependency Depth</span>
+              <span style="font-weight:700;color:#10b981;">10%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:40%;background:#10b981;"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════
+       PAGE: TEAM OVERLOAD
+  ═══════════════════════════════════════════════════════ -->
+  <section class="page" id="page-overload">
+    <div class="section-header">
+      <div>
+        <div class="section-title">🔥 Team Overload Detection</div>
+        <div class="section-subtitle">Workload index per member · Reassignment suggestions</div>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card danger">
+        <div class="stat-label">Overloaded (≥100%)</div>
+        <div class="stat-value" style="color:var(--accent-red);" id="ov-overloaded-count">–</div>
+        <div class="stat-icon">🔴</div>
+      </div>
+      <div class="stat-card warning">
+        <div class="stat-label">High Load (85–99%)</div>
+        <div class="stat-value" style="color:var(--accent-amber);" id="ov-at-risk-count">–</div>
+        <div class="stat-icon">🟡</div>
+      </div>
+      <div class="stat-card success">
+        <div class="stat-label">Normal (&lt;85%)</div>
+        <div class="stat-value" style="color:var(--accent-green);" id="ov-normal-count">–</div>
+        <div class="stat-icon">🟢</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Team Avg Load</div>
+        <div class="stat-value gradient" id="ov-avg-load">–</div>
+        <div class="stat-icon">📊</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:20px;">
+      <div class="card">
+        <div class="card-title">🫧 Workload Bubble Chart</div>
+        <div class="card-subtitle">Hours assigned × task count × load intensity</div>
+        <div class="chart-wrap" style="height:280px;">
+          <canvas id="ov-bubble-chart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Workload Index by Member</div>
+        <div class="card-subtitle">Red line = 100% capacity threshold</div>
+        <div class="chart-wrap" style="height:280px;">
+          <canvas id="ov-bar-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:16px;">👤 Member Workload Cards</div>
+      <div id="ov-member-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;"></div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════
+       PAGE: PRODUCTIVITY ANALYTICS
+  ═══════════════════════════════════════════════════════ -->
+  <section class="page" id="page-productivity">
+    <div class="section-header">
+      <div>
+        <div class="section-title">📈 Team Productivity Analytics</div>
+        <div class="section-subtitle">Velocity · Cycle time · Throughput · Per-member scoring</div>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-label">Avg Velocity</div>
+        <div class="stat-value gradient" id="prod-avg-velocity">–</div>
+        <div class="stat-delta">SP / sprint</div>
+        <div class="stat-icon">⚡</div>
+      </div>
+      <div class="stat-card success">
+        <div class="stat-label">Avg Cycle Time</div>
+        <div class="stat-value" style="color:var(--accent-green);" id="prod-avg-cycle">–</div>
+        <div class="stat-delta up">Task start → done</div>
+        <div class="stat-icon">🔄</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Weekly Throughput</div>
+        <div class="stat-value gradient" id="prod-throughput">–</div>
+        <div class="stat-delta" id="prod-throughput-delta">–</div>
+        <div class="stat-icon">📦</div>
+      </div>
+      <div class="stat-card warning">
+        <div class="stat-label">Avg Bugs / Week</div>
+        <div class="stat-value" style="color:var(--accent-amber);" id="prod-bug-ratio">–</div>
+        <div class="stat-delta">Opened per week</div>
+        <div class="stat-icon">🐛</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-title">🚀 Sprint Velocity · Planned vs Completed</div>
+      <div class="card-subtitle">Bar = story points · Line = rolling velocity trend</div>
+      <div class="chart-wrap" style="height:280px;">
+        <canvas id="prod-velocity-chart"></canvas>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:20px;">
+      <div class="card">
+        <div class="card-title">🔄 Cycle Time Trend</div>
+        <div class="card-subtitle">Days from task start to completion · 12-week view</div>
+        <div class="chart-wrap" style="height:240px;">
+          <canvas id="prod-cycle-chart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📦 Throughput &amp; Bug Rate</div>
+        <div class="card-subtitle">Weekly tasks done · bugs opened · 4-wk rolling avg</div>
+        <div class="chart-wrap" style="height:240px;">
+          <canvas id="prod-throughput-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">🕸️ Member Productivity Radar</div>
+        <div class="card-subtitle">Productivity score vs on-time delivery rate</div>
+        <div class="chart-wrap" style="height:300px;">
+          <canvas id="prod-member-chart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🏆 Team Leaderboard</div>
+        <div class="card-subtitle">Ranked by AI productivity score</div>
+        <div id="prod-leaderboard"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════
+       PAGE: RISK SCORING
+  ═══════════════════════════════════════════════════════ -->
+  <section class="page" id="page-risk">
+    <div class="section-header">
+      <div>
+        <div class="section-title">🛡️ Risk Scoring</div>
+        <div class="section-subtitle">Composite risk index from historical task &amp; event data</div>
+      </div>
+    </div>
+
+    <div class="project-selector" id="risk-proj-selector"></div>
+
+    <div class="grid-2" style="margin-bottom:20px;">
+      <!-- Score + badge -->
+      <div class="card" style="display:flex;flex-direction:column;justify-content:center;">
+        <div class="card-title">🎯 Overall Risk Score</div>
+        <div class="card-subtitle">Composite of 5 risk dimensions · Scale 0–100</div>
+        <div id="risk-score-display"></div>
+        <div id="risk-recommendations" style="margin-top:8px;"></div>
+      </div>
+
+      <!-- Radar -->
+      <div class="card">
+        <div class="card-title">🕸️ Risk Radar · All Projects</div>
+        <div class="card-subtitle">Multi-project risk factor comparison</div>
+        <div class="chart-wrap" style="height:300px;">
+          <canvas id="risk-radar-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Breakdown grid -->
+    <div style="margin-bottom:20px;">
+      <div style="font-size:15px;font-weight:700;margin-bottom:12px;">📊 Risk Factor Breakdown</div>
+      <div id="risk-breakdown-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;"></div>
+    </div>
+
+    <div class="grid-2">
+      <!-- Trend -->
+      <div class="card">
+        <div class="card-title">📉 Risk Score Trend</div>
+        <div class="card-subtitle">Historical composite score across last 7 sprints</div>
+        <div class="chart-wrap" style="height:240px;">
+          <canvas id="risk-trend-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- Event log -->
+      <div class="card">
+        <div class="card-title">📋 Risk Event Log</div>
+        <div class="card-subtitle">Logged incidents affecting this project</div>
+        <div id="risk-event-log"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════
+       PAGE: AI REPORTS
+  ═══════════════════════════════════════════════════════ -->
+  <section class="page" id="page-reports">
+    <div class="section-header">
+      <div>
+        <div class="section-title">🤖 AI Project Health Reports</div>
+        <div class="section-subtitle">GPT-style narrative analysis · Auto-generated from all metrics</div>
+      </div>
+      <div class="section-actions">
+        <button class="topbar-btn primary" onclick="ReportGenerator.refresh()">🔄 Regenerate</button>
+      </div>
+    </div>
+
+    <div class="project-selector" id="report-proj-selector"></div>
+    <div id="report-container"></div>
+  </section>
+
+</main>
+
+<!-- ══════════════════════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════════════════════ -->
+<!-- APP_DATA shell – populated by api.js at runtime -->
+<script>
+  // Empty shell; api.js will fill this from the backend.
+  // data.js is kept for offline/static fallback only.
+  const APP_DATA = { projects:[], tasks:[], members:[], sprints:[], workload:[], weeklyMetrics:[], memberHistory:[], riskEvents:[] };
+</script>
+
+<script src="js/ml-engine.js"></script>
+<script src="js/api.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/completion.js"></script>
+<script src="js/delay.js"></script>
+<script src="js/overload.js"></script>
+<script src="js/productivity.js"></script>
+<script src="js/risk.js"></script>
+<script src="js/reports.js"></script>
+
+<script>
+  // ── Theme Manager ────────────────────────────────────────
+  function setTheme(theme) {
+    if (theme === 'default') {
+      document.body.removeAttribute('data-theme');
+    } else {
+      document.body.setAttribute('data-theme', theme);
+    }
+    localStorage.setItem('project-iq-theme', theme);
+    const sel = document.getElementById('theme-selector');
+    if (sel) sel.value = theme;
+    
+    // Refresh the current page to ensure visual consistency
+    if (typeof refreshAll === 'function') refreshAll();
+  }
+
+  // Load saved theme immediately to prevent flashing
+  const savedTheme = localStorage.getItem('project-iq-theme') || 'default';
+  if (savedTheme !== 'default') {
+    document.body.setAttribute('data-theme', savedTheme);
+  }
+
+  // ── Page titles ─────────────────────────────────────────
+  const pageMeta = {
+    dashboard:   { title: 'Dashboard Overview',          sub: 'Portfolio health at a glance' },
+    completion:  { title: 'Completion Date Prediction',  sub: 'Monte Carlo · PERT estimation' },
+    delay:       { title: 'Delay Prediction',            sub: 'ML-scored task risk analysis' },
+    overload:    { title: 'Team Overload Detection',     sub: 'Workload index per member' },
+    productivity:{ title: 'Productivity Analytics',      sub: 'Velocity · Cycle time · Throughput' },
+    risk:        { title: 'Risk Scoring',                sub: 'Composite risk from historical data' },
+    reports:     { title: 'AI Health Reports',           sub: 'GPT-style project narrative analysis' },
+  };
+
+  let currentPage = 'dashboard';
+
+  function navigate(page) {
+    // Hide all pages
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+    document.getElementById('page-' + page).classList.add('active');
+    document.getElementById('nav-' + page).classList.add('active');
+
+    const meta = pageMeta[page] || {};
+    document.getElementById('topbar-title').textContent    = meta.title || page;
+    document.getElementById('topbar-subtitle').textContent = meta.sub   || '';
+
+    currentPage = page;
+    renderPage(page);
+  }
+
+  function renderPage(page) {
+    switch(page) {
+      case 'dashboard':    Dashboard.render();             break;
+      case 'completion':   CompletionPredictor.render();   break;
+      case 'delay':        DelayPredictor.render();        break;
+      case 'overload':     OverloadDetector.render();      break;
+      case 'productivity': ProductivityAnalytics.render(); break;
+      case 'risk':         RiskAnalyzer.render();          break;
+      case 'reports':      ReportGenerator.render();       break;
+    }
+  }
+
+  function refreshAll() {
+    renderPage(currentPage);
+  }
+
+  // ── Dynamic nav badges ───────────────────────────────────
+  function updateBadges() {
+    const highRisk = APP_DATA.tasks.filter(t => {
+      const score = MLEngine.delayScore(t, APP_DATA.memberHistory, APP_DATA.workload);
+      return score >= 70 && t.status !== 'done';
+    }).length;
+    const overloaded = APP_DATA.workload.filter(w => MLEngine.workloadIndex(w.memberId) >= 100).length;
+
+    const db = document.getElementById('badge-delay');
+    const ob = document.getElementById('badge-overload');
+    if (db) { db.textContent = highRisk; db.style.display = highRisk ? '' : 'none'; }
+    if (ob) { ob.textContent = overloaded; ob.style.display = overloaded ? '' : 'none'; }
+  }
+
+  // ── Animate stat numbers ─────────────────────────────────
+  function animateCounter(el, target, duration = 800) {
+    if (!el) return;
+    const start  = 0;
+    const range  = target - start;
+    const step   = Math.ceil(duration / Math.abs(range) || 16);
+    let current  = start;
+    const timer  = setInterval(() => {
+      current += Math.ceil(range / (duration / step));
+      if (current >= target) { current = target; clearInterval(timer); }
+      el.textContent = current;
+    }, step);
+  }
+
+  // ── Loading Overlay ──────────────────────────────────────
+  function showLoader(msg) {
+    let ov = document.getElementById('app-loader');
+    if (!ov) {
+      ov = document.createElement('div');
+      ov.id = 'app-loader';
+      ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:#07080f;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;';
+      ov.innerHTML = `
+        <div style="font-size:48px;">🧠</div>
+        <div style="font-size:20px;font-weight:800;background:linear-gradient(135deg,#7c3aed,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">ProjectIQ</div>
+        <div class="spinner" style="width:36px;height:36px;border-width:3px;"></div>
+        <div id="loader-msg" style="font-size:14px;color:#475569;">Connecting to backend…</div>
+      `;
+      document.body.appendChild(ov);
+    }
+    document.getElementById('loader-msg').textContent = msg;
+  }
+
+  function hideLoader() {
+    const ov = document.getElementById('app-loader');
+    if (ov) { ov.style.transition = 'opacity 0.4s'; ov.style.opacity = '0'; setTimeout(() => ov.remove(), 400); }
+  }
+
+  // ── Boot ─────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', async () => {
+    const sel = document.getElementById('theme-selector');
+    if (sel) sel.value = localStorage.getItem('project-iq-theme') || 'default';
+    showLoader('Connecting to backend…');
+    try {
+      document.getElementById('loader-msg').textContent = 'Loading projects & tasks from database…';
+      await API.loadAll();
+      document.getElementById('loader-msg').textContent = 'Running AI analysis…';
+      await new Promise(r => setTimeout(r, 400));  // brief dramatic pause
+      hideLoader();
+      updateBadges();
+      navigate('dashboard');
+    } catch (err) {
+      console.error('Backend unavailable, falling back to static data:', err);
+      // Fallback: load static data.js if backend is down
+      const script = document.createElement('script');
+      script.src = 'js/data.js';
+      script.onload = () => {
+        Object.assign(APP_DATA, window._STATIC_APP_DATA || APP_DATA);
+        hideLoader();
+        updateBadges();
+        navigate('dashboard');
+      };
+      document.head.appendChild(script);
+    }
+    // Auto-refresh badges every 60s
+    setInterval(updateBadges, 60000);
+  });
+
+  // ── Task Modal Management ────────────────────────────────
+  function openTaskModal() {
+    const projSelect = document.getElementById('task-project');
+    const userSelect = document.getElementById('task-assignee');
+    
+    // Populate projects
+    projSelect.innerHTML = APP_DATA.projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+    // Populate assignees
+    userSelect.innerHTML = APP_DATA.members.map(m => `<option value="${m.id}">${m.name} (${m.role})</option>`).join('');
+    
+    // Set default due date (7 days from now)
+    const nextWeek = new Date();
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    document.getElementById('task-due-date').value = nextWeek.toISOString().slice(0, 10);
+    
+    document.getElementById('task-modal').classList.add('open');
+  }
+
+  function closeTaskModal() {
+    document.getElementById('task-modal').classList.remove('open');
+    document.getElementById('new-task-form').reset();
+  }
+
+  async function handleCreateTask(e) {
+    e.preventDefault();
+    const title = document.getElementById('task-title').value;
+    const project = document.getElementById('task-project').value;
+    const assignee = document.getElementById('task-assignee').value;
+    const storyPoints = parseInt(document.getElementById('task-story-points').value, 10);
+    const estimatedDays = parseInt(document.getElementById('task-estimated-days').value, 10);
+    const complexity = document.getElementById('task-complexity').value;
+    const dueDate = document.getElementById('task-due-date').value;
+    
+    const taskId = 't' + (APP_DATA.tasks.length + 1);
+    
+    showLoader('Creating task...');
+    try {
+      await API.createTask({
+        id: taskId,
+        project,
+        title,
+        assignee,
+        status: 'todo',
+        storyPoints,
+        estimatedDays,
+        actualDays: 0,
+        complexity,
+        dependencies: [],
+        dueDate,
+        tags: []
+      });
+      closeTaskModal();
+      // Recalculate and re-render
+      updateBadges();
+      refreshAll();
+      hideLoader();
+    } catch (err) {
+      console.error('Failed to create task:', err);
+      alert('Error creating task: ' + err.message);
+      hideLoader();
+    }
+  }
+</script>
+
+<!-- ══════════════════════════════════════════════════════════
+     MODAL: CREATE TASK
+═══════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="task-modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title">➕ Create New Task</div>
+      <button class="modal-close" onclick="closeTaskModal()">&times;</button>
+    </div>
+    <form id="new-task-form" onsubmit="handleCreateTask(event)">
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="task-title">Task Title</label>
+          <input type="text" id="task-title" required placeholder="e.g. Refactor API controllers" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="task-project">Project</label>
+            <select id="task-project" required></select>
+          </div>
+          <div class="form-group">
+            <label for="task-assignee">Assignee</label>
+            <select id="task-assignee" required></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="task-story-points">Story Points</label>
+            <select id="task-story-points">
+              <option value="1">1 SP</option>
+              <option value="2">2 SP</option>
+              <option value="3">3 SP</option>
+              <option value="5" selected>5 SP</option>
+              <option value="8">8 SP</option>
+              <option value="13">13 SP</option>
+              <option value="21">21 SP</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="task-estimated-days">Estimated Days</label>
+            <select id="task-estimated-days">
+              <option value="1">1 day</option>
+              <option value="2">2 days</option>
+              <option value="3" selected>3 days</option>
+              <option value="5">5 days</option>
+              <option value="8">8 days</option>
+              <option value="12">12 days</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="task-complexity">Complexity</label>
+            <select id="task-complexity">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+              <option value="very_high">Very High</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="task-due-date">Due Date</label>
+            <input type="text" id="task-due-date" placeholder="YYYY-MM-DD" />
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="topbar-btn" onclick="closeTaskModal()">Cancel</button>
+          <button type="submit" class="topbar-btn primary">Create Task</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+</body>
+</html>
